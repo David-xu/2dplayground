@@ -1,0 +1,4 @@
+# 2d绘制部分来源:https://github.com/skywind3000/mini3d
+# 向大佬致敬
+
+# Makefile在mingw 64下构建
