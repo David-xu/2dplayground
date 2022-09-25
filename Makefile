@@ -2,8 +2,8 @@ APP:=2dplayground
 SRC_DIR:= ./src
 SRC:= $(foreach n, $(SRC_DIR), $(wildcard $(n)/*.c))
 OBJ:= $(SRC:.c=.o)
-CFLAGS:=-Wall -Wno-unused-function -g
-LDFLAGS:=-lgdi32 -lpthread
+CFLAGS:=-Wall -Wno-unused-function -Wno-stringop-overread -g
+LDFLAGS:=-lgdi32 -lpthread -lWinmm -lws2_32
 
 all: $(APP)
 

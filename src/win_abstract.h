@@ -4,22 +4,31 @@
 #include <windows.h>
 #include <tchar.h>
 
+#define PGWINAB_MAX_LINE        2048
+
 typedef unsigned int IUINT32;
+
+typedef int (*wind_msg_cb)(void *param, UINT msg, WPARAM wParam, LPARAM lParam);
 
 typedef struct {
     HWND screen_handle;         // 主窗口 HWND
     HDC screen_dc;              // 配套的 HDC
     HBITMAP screen_hb;          // DIB
     HBITMAP screen_ob;          // 老的 BITMAP
+
     unsigned char *screen_fb;   // frame buffer
+    unsigned char *screen_fb_line[PGWINAB_MAX_LINE];
 
     int screen_w, screen_h, fb_size;
 
     volatile int exit_sig;
     int screen_keys[512];       // 当前键盘按下状态
+
+    wind_msg_cb msg_cb;;
+    void *msg_cb_param;
 } pg_win_ab_t;
 
-int screen_init(pg_win_ab_t *wind, int w, int h, const TCHAR *title);
+int screen_init(pg_win_ab_t *wind, int w, int h, const TCHAR *title, wind_msg_cb msg_cb, void *msg_cb_param);
 int screen_unint(pg_win_ab_t *wind);
 void screen_dispatch(void);
 void screen_update(pg_win_ab_t *wind);
