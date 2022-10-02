@@ -20,12 +20,12 @@ static int pg_simple_2d_wind_msg_cb(void *param, UINT msg, WPARAM wParam, LPARAM
             cpkl_printf("E\n");
             pg_simple_2d_obj_mv_rotate(obj, PI/16);
         } else if (wParam == '9') {
-            if (obj->mv.velocity > 0) {
-                obj->mv.velocity--;
+            if (obj->mv.velocity >= 5) {
+                obj->mv.velocity -= 5;
             }
         } else if (wParam == '0') {
-            if (obj->mv.velocity < 100) {
-                obj->mv.velocity++;
+            if (obj->mv.velocity < 200) {
+                obj->mv.velocity += 5;
             }
         }
 
@@ -58,19 +58,45 @@ static void sys_tick(void *param)
         /* update pos */
         pg_simple_2d_pos_change(p, ctx->sys_tick_cycle / 1000.0);
 
-        p->obj_draw(ctx, p);
+        if (p->obj_tick) {
+            p->obj_tick(p, ctx->sys_tick_cycle / 1000.0);
+        }
+
+        if (p->obj_draw) {
+            p->obj_draw(&(ctx->window), p);
+        }
     }
+    ctx->sys_tick_count++;
 
     screen_update(&(ctx->window));
 }
 
 static int pg_simple_2d_init_obj(pg_simple_2d_ctx_t *ctx)
 {
+#if 0
     pg_simple_2d_obj_t *test_obj = malloc(sizeof(pg_simple_2d_obj_t));
     pg_simple_2d_obj_init(test_obj, 8, 16);
     memset(test_obj->obj_frame_buf, 0xa0, test_obj->fb_size);
     pg_simple_2d_obj_set_mv(test_obj, PI / 8, 20);
     pg_simple_2d_add_obj(ctx, test_obj);
+#else
+    pixblk_obj_t *pixblk_obj = malloc(sizeof(pixblk_obj_t));
+    pg_pos_t pixblk_topleft_pos = {0, 0};
+    uint32_t pixblk_raw[5 * 5] = {
+        0xffffff, 0xffffff, 0xffffff, 0xffffff, 0xffffff,
+        0xffffff, 0,      0xffffff, 0     , 0xffffff,
+        0xffffff, 0xffffff, 0,      0xffffff, 0xffffff,
+        0xffffff, 0,      0xffffff, 0     , 0xffffff,
+        0xffffff, 0xffffff, 0xffffff, 0xffffff, 0xffffff
+    };
+    pixblk_obj_init(pixblk_obj,
+        &pixblk_topleft_pos,
+        128, 64,
+        1, 5,
+        (uint8_t *)pixblk_raw,
+        0xffffff);
+    pg_simple_2d_add_obj(ctx, &(pixblk_obj->simple_2d_obj));
+#endif
 
     return 0;
 }
@@ -102,17 +128,18 @@ int pg_simple_2d_add_obj(pg_simple_2d_ctx_t *ctx, pg_simple_2d_obj_t *obj)
     return 0;
 }
 
-int pg_simple_2d_simple_obj_draw(pg_simple_2d_ctx_t *ctx, pg_simple_2d_obj_t *obj)
+int pg_simple_2d_simple_obj_draw(pg_win_ab_t *window, pg_simple_2d_obj_t *obj)
 {
+#if 0
     int j;
     for (j = 0; j < obj->h; j++) {
-        memcpy(ctx->window.screen_fb_line[(int)(obj->topleft_pos.y) + j] + ((int)(obj->topleft_pos.x)) * 4,
+        memcpy(window->screen_fb_line[(int)(obj->topleft_pos.y) + j] + ((int)(obj->topleft_pos.x)) * 4,
             obj->obj_frame_buf_line[j],
             obj->w * 4);
     }
     // cpkl_printf("x %d, y %d\n", obj->topleft_pos.x, obj->topleft_pos.y);
-
-    return 0;
+#endif
+    return screen_draw_texture(window, obj->obj_frame_buf_line, obj->topleft_pos.x, obj->topleft_pos.y, obj->w, obj->h);
 }
 
 int pg_simple_2d_obj_init(pg_simple_2d_obj_t *obj, int w, int h)

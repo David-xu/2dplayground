@@ -23,9 +23,10 @@ typedef struct {
 } pg_movement_vector_t;
 
 struct _pg_simple_2d_obj;
-struct _pg_simple_2d_ctx;
 
-typedef int (*pg_obj_draw)(struct _pg_simple_2d_ctx *ctx, struct _pg_simple_2d_obj *obj);
+typedef int (*pg_obj_draw)(pg_win_ab_t *window, struct _pg_simple_2d_obj *obj);
+typedef int (*pg_obj_tick)(struct _pg_simple_2d_obj *obj, float delta_second);
+
 
 #define PG_SIMPLE_2D_OBJ_MAX_HEIGHT          32
 
@@ -35,6 +36,7 @@ typedef struct _pg_simple_2d_obj {
     pg_pos_t                topleft_pos;
     pg_movement_vector_t    mv;
     pg_obj_draw             obj_draw;
+    pg_obj_tick             obj_tick;
 
     cpkl_listhead_t         obj_list_entry;
 

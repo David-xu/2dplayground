@@ -137,3 +137,13 @@ void screen_update(pg_win_ab_t *wind) {
 void screen_clean(pg_win_ab_t *wind, int clean_color) {
     memset(wind->screen_fb, clean_color, wind->fb_size);
 }
+
+int screen_draw_texture(pg_win_ab_t *window, uint8_t *texture[], uint32_t topleft_pos_x, uint32_t topleft_pos_y, uint32_t width, uint32_t height)
+{
+    int line;
+    for (line = 0; line < height; line++) {
+        memcpy(window->screen_fb_line[topleft_pos_y + line] + topleft_pos_x * 4, texture[line], width * 4);
+    }
+
+    return 0;
+}

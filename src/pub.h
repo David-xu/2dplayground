@@ -10,6 +10,7 @@
 #include "cpkl.h"
 #include "win_abstract.h"
 #include "simple2d.h"
+#include "pixblk_engine.h"
 
 #define PI              3.1415926
 

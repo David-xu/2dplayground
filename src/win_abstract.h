@@ -33,5 +33,6 @@ int screen_unint(pg_win_ab_t *wind);
 void screen_dispatch(void);
 void screen_update(pg_win_ab_t *wind);
 void screen_clean(pg_win_ab_t *wind, int clean_color);
+int screen_draw_texture(pg_win_ab_t *window, uint8_t *texture[], uint32_t topleft_pos_x, uint32_t topleft_pos_y, uint32_t width, uint32_t height);
 
 #endif
