@@ -3,35 +3,90 @@
 static int pg_simple_2d_wind_msg_cb(void *param, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     pg_simple_2d_ctx_t *ctx = (pg_simple_2d_ctx_t *)param;
-    pg_simple_2d_obj_t *obj = NULL;
-    /* get obj */
-    if (CPKL_LISTISEMPLY(&(ctx->obj_list_head))) {
-        return 0;
-    }
+    pg_simple_2d_obj_t *obj = NULL, *n;
+    int obj_idx = 0;
 
-    obj = CPKL_GETCONTAINER(ctx->obj_list_head.next, pg_simple_2d_obj_t, obj_list_entry);
+    CPKL_LISTENTRYWALK_SAVE(obj, n, pg_simple_2d_obj_t, &(ctx->obj_list_head), obj_list_entry)
+    {
+        switch (msg) {
+        case WM_KEYDOWN:
+#if 0
+            if (wParam == 'Q') {
+                cpkl_printf("Q\n");
+                pg_simple_2d_obj_mv_rotate(obj, -PI/16);
+            }
+            if (wParam == 'E') {
+                cpkl_printf("E\n");
+                pg_simple_2d_obj_mv_rotate(obj, PI/16);
+            }
 
-    switch (msg) {
-    case WM_KEYDOWN:
-        if (wParam == 'Q') {
-            cpkl_printf("Q\n");
-            pg_simple_2d_obj_mv_rotate(obj, -PI/16);
-        } else if (wParam == 'E') {
-            cpkl_printf("E\n");
-            pg_simple_2d_obj_mv_rotate(obj, PI/16);
-        } else if (wParam == '9') {
-            if (obj->mv.velocity >= 5) {
-                obj->mv.velocity -= 5;
+            if (wParam == '9') {
+                if (obj->mv.velocity >= 5) {
+                    obj->mv.velocity -= 5;
+                }
             }
-        } else if (wParam == '0') {
-            if (obj->mv.velocity < 200) {
-                obj->mv.velocity += 5;
+            if (wParam == '0') {
+                if (obj->mv.velocity < 200) {
+                    obj->mv.velocity += 5;
+                }
             }
+#else
+            if (obj_idx == 0) {
+                if (wParam == 'W') {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_UP);
+                }
+                if (wParam == 'S') {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_DOWN);
+                }
+                if (wParam == 'A') {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_LEFT);
+                }
+                if (wParam == 'D') {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_RIGHT);
+                }
+            } else {
+                if (wParam == VK_UP) {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_UP);
+                }
+                if (wParam == VK_DOWN) {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_DOWN);
+                }
+                if (wParam == VK_LEFT) {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_LEFT);
+                }
+                if (wParam == VK_RIGHT) {
+                    pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                    snake->kbop(snake, SUBOBJ_SNAKE_OP_RIGHT);
+                }
+            }
+
+            if (wParam == '9') {
+                pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                snake->kbop(snake, SUBOBJ_SNAKE_OP_SPEEDDOWN);
+            }
+            if (wParam == '0') {
+                pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                snake->kbop(snake, SUBOBJ_SNAKE_OP_SPEEDUP);
+            }
+
+            if (wParam == VK_SPACE) {
+                pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                snake_reset(snake);
+            }
+#endif
+            break;
+        default:
+            /* do nothing */
         }
 
-        break;
-    default:
-        /* do nothing */
+        obj_idx++;
     }
 
     return 0;
@@ -80,22 +135,21 @@ static int pg_simple_2d_init_obj(pg_simple_2d_ctx_t *ctx)
     pg_simple_2d_obj_set_mv(test_obj, PI / 8, 20);
     pg_simple_2d_add_obj(ctx, test_obj);
 #else
-    pixblk_obj_t *pixblk_obj = malloc(sizeof(pixblk_obj_t));
-    pg_pos_t pixblk_topleft_pos = {0, 0};
-    uint32_t pixblk_raw[5 * 5] = {
-        0xffffff, 0xffffff, 0xffffff, 0xffffff, 0xffffff,
-        0xffffff, 0,      0xffffff, 0     , 0xffffff,
-        0xffffff, 0xffffff, 0,      0xffffff, 0xffffff,
-        0xffffff, 0,      0xffffff, 0     , 0xffffff,
-        0xffffff, 0xffffff, 0xffffff, 0xffffff, 0xffffff
-    };
-    pixblk_obj_init(pixblk_obj,
-        &pixblk_topleft_pos,
-        128, 64,
-        1, 5,
-        (uint8_t *)pixblk_raw,
-        0xffffff);
-    pg_simple_2d_add_obj(ctx, &(pixblk_obj->simple_2d_obj));
+    pixblk_subobj_snake_t *snake0, *snake1;
+    pg_pos_t topleft_pos;
+
+    snake0 = (pixblk_subobj_snake_t *)malloc(sizeof(pixblk_subobj_snake_t));
+    topleft_pos.x = 0;
+    topleft_pos.y = 0;
+    snake_init(snake0, &topleft_pos);
+    pg_simple_2d_add_obj(ctx, &(snake0->pixblk.simple_2d_obj));
+
+    snake1 = (pixblk_subobj_snake_t *)malloc(sizeof(pixblk_subobj_snake_t));
+    topleft_pos.x = 400;
+    topleft_pos.y = 0;
+    snake_init(snake1, &topleft_pos);
+    pg_simple_2d_add_obj(ctx, &(snake1->pixblk.simple_2d_obj));
+
 #endif
 
     return 0;

@@ -5,6 +5,16 @@ typedef struct {
     float x, y;
 } pg_pos_t;
 
+static inline int pg_is_same_pos(pg_pos_t *a, pg_pos_t *b)
+{
+    if ((fabs(a->x - b->x) < 1e-6) &&
+        (fabs(a->y - b->y) < 1e-6)) {
+        return 1;
+    }
+
+    return 0;
+}
+
 typedef struct {
     float   x, y;
 } pg_vector_t;
