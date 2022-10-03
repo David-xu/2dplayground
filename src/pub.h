@@ -12,6 +12,7 @@
 #include "simple2d.h"
 #include "pixblk_engine.h"
 #include "snake.h"
+#include "scoreboard.h"
 
 #define PI              3.1415926
 

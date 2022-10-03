@@ -78,7 +78,7 @@ static int pg_simple_2d_wind_msg_cb(void *param, UINT msg, WPARAM wParam, LPARAM
 
             if (wParam == VK_SPACE) {
                 pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
-                snake_reset(snake);
+                snake->kbop(snake, SUBOBJ_SNAKE_OP_RESET);
             }
 #endif
             break;
@@ -141,13 +141,13 @@ static int pg_simple_2d_init_obj(pg_simple_2d_ctx_t *ctx)
     snake0 = (pixblk_subobj_snake_t *)malloc(sizeof(pixblk_subobj_snake_t));
     topleft_pos.x = 0;
     topleft_pos.y = 0;
-    snake_init(snake0, &topleft_pos);
+    snake_init(snake0, &topleft_pos, 0);
     pg_simple_2d_add_obj(ctx, &(snake0->pixblk.simple_2d_obj));
 
     snake1 = (pixblk_subobj_snake_t *)malloc(sizeof(pixblk_subobj_snake_t));
     topleft_pos.x = 400;
     topleft_pos.y = 0;
-    snake_init(snake1, &topleft_pos);
+    snake_init(snake1, &topleft_pos, 1);
     pg_simple_2d_add_obj(ctx, &(snake1->pixblk.simple_2d_obj));
 
 #endif

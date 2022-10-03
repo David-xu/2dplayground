@@ -6,6 +6,8 @@ int main(int argc, char *argv[])
 {
     MSG msg;
 
+    cpkl_printf("game start...\n");
+
     cpkl_ri_seed();
 
     pg_simple_2d_init(&g_ctx);
