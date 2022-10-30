@@ -106,10 +106,15 @@ static void sys_tick(void *param)
 {
     pg_simple_2d_ctx_t *ctx = (pg_simple_2d_ctx_t *)param;
     pg_simple_2d_obj_t *p, *n;
+    static int rand_init_done = 0;
+
+    if (rand_init_done == 0) {
+        cpkl_ri_seed();
+        rand_init_done = 1;
+    }
+
     // cpkl_printf("sys tick %d\n", ctx->sys_tick++);
     screen_clean(&(ctx->window), -0);
-
-    cpkl_ri_seed();
 
     CPKL_LISTENTRYWALK_SAVE(p, n, pg_simple_2d_obj_t, &(ctx->obj_list_head), obj_list_entry) {
         /* update pos */

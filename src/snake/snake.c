@@ -121,7 +121,7 @@ static int snake_add_dest_food(pixblk_subobj_snake_t *snake, snake_food_type_e f
     int idx;
     uint32_t rand_num, x, y;
     pg_pos_t pos;
-    uint32_t rand_list[PIXBLK_ENGINE_MAX_Y * PIXBLK_ENGINE_MAX_X], n_possible = 0;
+    uint32_t rand_list[PIXBLK_ENGINE_MAX_Y * PIXBLK_ENGINE_MAX_X] = {0}, n_possible = 0;
 
     idx = snake_destfood_find(snake, food_type);
     if (idx != -1) {
