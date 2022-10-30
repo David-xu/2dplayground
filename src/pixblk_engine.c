@@ -1,24 +1,55 @@
 #include "pub.h"
 
+int pixblk_pattern_init(uint32_t pattern[], uint32_t color)
+{
+    int i, default_pattern[] = {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 0, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 0, 1, 1, 1, 1, 1, 1, 1,
+        1, 0, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 0, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 0, 1, 1, 1, 1, 1, 1, 1,
+        1, 0, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    };
+
+    for (i = 0; i < CPKL_ARRAY_SIZE(default_pattern); i++) {
+        if (default_pattern[i]) {
+            pattern[i] = color;
+        } else {
+            pattern[i] = 0;
+        }
+    }
+
+    return 0;
+}
+
 static int pkxblk_obj_draw(pg_win_ab_t *window, pg_simple_2d_obj_t *obj)
 {
     pixblk_obj_t *pixblk = CPKL_GETCONTAINER(obj, pixblk_obj_t, simple_2d_obj);
     int x, y;
     uint32_t topleft_x, topleft_y;
+    pixblk_draw_pattern_e pattern;
 
     for (y = 0; y < pixblk->pix_bm_height; y++) {
         topleft_y = 2 + obj->topleft_pos.y + y * (pixblk->interval_width + pixblk->pixblk_width);
         for (x = 0; x < pixblk->pix_bm_width; x++) {
             topleft_x = 2 + obj->topleft_pos.x + x * (pixblk->interval_width + pixblk->pixblk_width);
-            switch (pixblk->pix_bm[y][x]) {
+            pattern = pixblk->pix_bm[y][x];
+            switch (pattern) {
             case PIXBLK_DRAWPATTEN_NONE:
             case PIXBLK_DRAWPATTEN_NORMAL:
-                screen_draw_texture(window, pixblk->pixblk_pattern[pixblk->pix_bm[y][x]].pixblk_buf_line,
+                screen_draw_texture(window, pixblk->pixblk_pattern[pattern].pixblk_buf_line,
                     topleft_x, topleft_y, pixblk->pixblk_width, pixblk->pixblk_width);
                 break;
-            case PIXBLK_DRAWPATTEN_NORMAL_BLINK:
+            case PIXBLK_DRAWPATTEN_NORMAL_BLINK_RED:
+            case PIXBLK_DRAWPATTEN_NORMAL_BLINK_GREEN:
+            case PIXBLK_DRAWPATTEN_NORMAL_BLINK_BLUE:
                 if (pixblk->blink_flag) {
-                    screen_draw_texture(window, pixblk->pixblk_pattern[pixblk->pix_bm[y][x]].pixblk_buf_line,
+                    screen_draw_texture(window, pixblk->pixblk_pattern[pattern].pixblk_buf_line,
                         topleft_x, topleft_y, pixblk->pixblk_width, pixblk->pixblk_width);
                 }
                 break;
@@ -98,13 +129,13 @@ int pixblk_obj_tick(pixblk_obj_t *pixblk, float delta_second)
     int n_tick;
 
     pixblk->tick_sum++;
-    n_tick = pixblk->blink_cycle / delta_second;
-    if (pixblk->tick_sum < n_tick) {
-        return 0;
-    }
 
-    pixblk->blink_flag ^= 1;
-    pixblk->tick_sum = 0;
+    /* blink */
+    n_tick = pixblk->blink_cycle / delta_second;
+    if (pixblk->tick_sum >= n_tick) {
+        pixblk->blink_flag ^= 1;
+        pixblk->tick_sum = 0;
+    }
 
     return 0;
 }

@@ -8,7 +8,9 @@
 typedef enum {
     PIXBLK_DRAWPATTEN_NONE = 0,
     PIXBLK_DRAWPATTEN_NORMAL,
-    PIXBLK_DRAWPATTEN_NORMAL_BLINK,
+    PIXBLK_DRAWPATTEN_NORMAL_BLINK_RED,
+    PIXBLK_DRAWPATTEN_NORMAL_BLINK_GREEN,
+    PIXBLK_DRAWPATTEN_NORMAL_BLINK_BLUE,
     PIXBLK_DRAWPATTEN_COUNT
 } pixblk_draw_pattern_e;
 
@@ -37,6 +39,8 @@ typedef struct _pixblk_obj {
 
 int pixblk_obj_init(pixblk_obj_t *pixblk, pg_pos_t *topleft_pos, uint32_t pix_bm_width, uint32_t pix_bm_height, uint32_t interval_width, uint32_t pixblk_width, uint8_t *pkxblk_buf[], uint32_t frameline_pix_color);
 int pixblk_obj_tick(pixblk_obj_t *pixblk, float delta_second);
+
+int pixblk_pattern_init(uint32_t pattern[], uint32_t color);
 
 #endif
 

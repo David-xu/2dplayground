@@ -109,6 +109,8 @@ static void sys_tick(void *param)
     // cpkl_printf("sys tick %d\n", ctx->sys_tick++);
     screen_clean(&(ctx->window), -0);
 
+    cpkl_ri_seed();
+
     CPKL_LISTENTRYWALK_SAVE(p, n, pg_simple_2d_obj_t, &(ctx->obj_list_head), obj_list_entry) {
         /* update pos */
         pg_simple_2d_pos_change(p, ctx->sys_tick_cycle / 1000.0);
