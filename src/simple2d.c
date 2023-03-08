@@ -75,6 +75,14 @@ static int pg_simple_2d_wind_msg_cb(void *param, UINT msg, WPARAM wParam, LPARAM
                 pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
                 snake->kbop(snake, SUBOBJ_SNAKE_OP_SPEEDUP);
             }
+            if (wParam == 'Z') {
+                pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                snake->kbop(snake, SUBOBJ_SNAKE_OP_P1_PRI);
+            }
+            if (wParam == 'M') {
+                pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);
+                snake->kbop(snake, SUBOBJ_SNAKE_OP_P2_PRI);
+            }
 
             if (wParam == VK_SPACE) {
                 pixblk_subobj_snake_t *snake = CPKL_GETCONTAINER(obj, pixblk_subobj_snake_t, pixblk.simple_2d_obj);

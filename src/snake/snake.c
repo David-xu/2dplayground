@@ -116,6 +116,19 @@ static inline void snake_shrink(pixblk_subobj_snake_t *snake)
     }
 }
 
+static inline void snake_set_player_pri(int p)
+{
+    if (g_snake[p]->speedup_p > 2) {
+        g_snake[p]->speedup_p -= 2;
+    }
+
+    if (g_snake[p]->shrink_p > 5) {
+        g_snake[p]->shrink_p -= 5;
+    }
+
+    cpkl_printf("player %d, speedup_p %d, shrink_p %d\n", p,
+        g_snake[p]->speedup_p, g_snake[p]->shrink_p);
+}
 static int snake_add_dest_food(pixblk_subobj_snake_t *snake, snake_food_type_e food_type)
 {
     int idx;
@@ -429,6 +442,12 @@ static int snake_msgfifo_dequeue(pixblk_subobj_snake_t *snake)
     case SUBOBJ_SNAKE_OP_RESET:
         do_snake_reset(snake);
         break;
+    case SUBOBJ_SNAKE_OP_P1_PRI:
+        snake_set_player_pri(0);
+        break;
+    case SUBOBJ_SNAKE_OP_P2_PRI:
+        snake_set_player_pri(1);
+        break;
     }
 
     if ((op == SUBOBJ_SNAKE_OP_UP) ||
@@ -530,14 +549,8 @@ int snake_init(pixblk_subobj_snake_t *snake, pg_pos_t *topleft_pos, int snake_id
     snake->snake_idx = snake_idx;
     snake->kbop = snake_kbop;
 
-    /* P0: low posibility, P1: high posiblity */
-    if (snake_idx == 0) {
-        snake->speedup_p = 12;
-        snake->shrink_p = 20;
-    } else {
-        snake->speedup_p = 4;
-        snake->shrink_p = 10;
-    }
+    snake->speedup_p = 12;
+    snake->shrink_p = 30;
 
     cpkl_initlisthead(&(snake->snake_head));
 
